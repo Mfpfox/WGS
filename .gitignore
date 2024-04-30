@@ -1,0 +1,27 @@
+## find /Users/mariapalafox/Desktop/TOOLBOXR -name ".git" -print
+
+.DS_Store
+.idea
+*.pyc
+*__pycache__*
+LICENSE
+README
+*.gz
+*.vcf
+*.html
+
+*.txt
+*.csv
+*.tsv
+
+*pptx
+*.docx
+*.doc
+*.xlsx
+*.xls
+
+*.png
+*.JPG
+*.jpeg
+*.pdf
+
