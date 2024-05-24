@@ -77,7 +77,7 @@ echo "STEP 2: Map to reference using BWA-MEM"
 bwa index ${ref}
 # BWA alignment with grouping tag step
     # SM is sample
-    # ID is ???
+    # ID from illumina
     # PL is platform
     # -R grouping ID added to each read in output sam file
     # -t multi-threading mode
@@ -94,13 +94,6 @@ echo "done STEP 2: read alignment to hg38"
 # --------------------------------------
 
 ```bash
-"""
-note STEP 2 submission: 
-    ran CAD12 step 2 without the -t 4 multithread option AND ran CAD63 step 2 with the multithread option.
-    CAD12 submitted 10 minutes before CAD63. all other variables were identical between the runs.
-    Does multi-thread make big difference in terms of time? YES BIG DIFF
-    Does the output have any issues caused by interaction between requested resources in bsub options and in script options?
-"""
 
 # 1. check sam file
     samtools view P732912.paired.sam | less
