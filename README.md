@@ -96,26 +96,9 @@ echo "done STEP 2: read alignment to hg38"
 
 # 1. check sam file
     samtools view P732912.paired.sam | less
-    samtools view P931263.paired.sam | less
 
 # 2. check flagstat file 
     samtools flagstat P732912.paired.sam
-        697658725 + 0 in total (QC-passed reads + QC-failed reads)
-        688534498 + 0 primary
-        0 + 0 secondary
-        9124227 + 0 supplementary
-        0 + 0 duplicates
-        0 + 0 primary duplicates
-        696588515 + 0 mapped (99.85% : N/A)
-        687464288 + 0 primary mapped (99.84% : N/A)
-        688534498 + 0 paired in sequencing
-        344267249 + 0 read1
-        344267249 + 0 read2
-        672431504 + 0 properly paired (97.66% : N/A)
-        686897210 + 0 with itself and mate mapped
-        567078 + 0 singletons (0.08% : N/A)
-        11230902 + 0 with mate mapped to a different chr
-        7810868 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
 
@@ -131,24 +114,22 @@ markduplicates attempt ran over lsf time and had a ton of I/O messages from SPAR
     also recommended to try allocating mem to spark, and add temp directory 
     so the writing from spark doesnt eat up the memory for processing
 
-    downloaded log and error files have job ID ending in 60 and 73
-
     gatk community board recommendation for large files :
         try first using queryname sort before running the mark duplicates function
             this could speed up time to mark duplicates, reduce by 1/2 total time needed
 """
 
-## loaded picard in interactive session - bsub4
+## loaded picard in interactive
 module load picard/3.1.1
 
 echo $PICARD
-    /hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar
+# /hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar
 
-[aligned_reads]$ $PICARD SortSam
-    /hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar: Permission denied
+$PICARD SortSam
+#/hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar: Permission denied
 
-[aligned_reads]$ java -jar $PICARD SortSam
-    USAGE: SortSam [arguments]
+java -jar $PICARD SortSam
+# USAGE: SortSam [arguments]
 
 ```
 
@@ -159,46 +140,16 @@ echo $PICARD
 ```bash
 
 module load picard/3.1.1
+
 java -jar $PICARD SortSam \
      INPUT=P732912.paired.sam \
      OUTPUT=P732912.paired.sorted.sam \
      SORT_ORDER=queryname
+
 echo 'done sorting CAD12'
 
 
-#!/bin/bash
-#BSUB -J sortQnameXXX 63 or 12
-#BSUB -P acc_vascbrain
-#BSUB -q premium
-#BSUB -n 1
-#BSUB -W 48:00
-#BSUB -R rusage[mem=256000]
-#BSUB -R span[hosts=1]
-#BSUB -oo %J.stdout
-#BSUB -eo %J.stderr
-#BSUB -L /bin/bash
-
-# latest version, main difference between this version and memory limit reached is number of 
-# reads in supplementary.
-
-# latest has 3,475,644, v1 had 9,124,227
 samtools flagstat P732912.paired.sorted.sam
-    692010142 + 0 in total (QC-passed reads + QC-failed reads)
-    688534498 + 0 primary
-    0 + 0 secondary
-    3475644 + 0 supplementary
-    0 + 0 duplicates
-    0 + 0 primary duplicates
-    690945913 + 0 mapped (99.85% : N/A)
-    687470269 + 0 primary mapped (99.85% : N/A)
-    688534498 + 0 paired in sequencing
-    344,267,249 + 0 read1
-    344,267,249 + 0 read2
-    674259388 + 0 properly paired (97.93% : N/A)
-    686908692 + 0 with itself and mate mapped
-    561577 + 0 singletons (0.08% : N/A)
-    9730322 + 0 with mate mapped to a different chr
-    7062698 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
 
@@ -231,23 +182,6 @@ gatk MarkDuplicatesSpark -I ${aligned_reads}/P732912.paired.sorted.sam -O \
 
 ```bash
 samtools flagstat P732912_sorted_dedup_reads.bam
-    692010142 + 0 in total (QC-passed reads + QC-failed reads)
-    688534498 + 0 primary
-    0 + 0 secondary
-    3475644 + 0 supplementary
-    146038285 + 0 duplicates
-    145508412 + 0 primary duplicates
-    690945913 + 0 mapped (99.85% : N/A)
-    687470269 + 0 primary mapped (99.85% : N/A)
-    688534498 + 0 paired in sequencing
-    344267249 + 0 read1
-    344267249 + 0 read2
-    674259388 + 0 properly paired (97.93% : N/A)
-    686908692 + 0 with itself and mate mapped
-    561577 + 0 singletons (0.08% : N/A)
-    9730322 + 0 with mate mapped to a different chr
-    7062698 + 0 with mate mapped to a different chr (mapQ>=5)
-
 ```
 
 
@@ -258,18 +192,26 @@ samtools flagstat P732912_sorted_dedup_reads.bam
 # ----------------------------------
 ```
 module load gatk
+
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 known_sites="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.dbsnp138.vcf"
 aligned_reads="/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads"
 results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
 data="/sc/arion/projects/vascbrain/WGS_iPSC/data"
-echo "STEP 4: Base quality recalibration --CAD 12"
+
+echo "STEP 4: Base quality recalibration"
+
 # 1. build the model
+
 gatk BaseRecalibrator -I ${aligned_reads}/P732912_sorted_dedup_reads.bam -R \
     ${ref} --known-sites ${known_sites} -O ${data}/recal_12data.table
+
 # 2. Apply the model to adjust the base quality scores
-gatk ApplyBQSR -I ${aligned_reads}/P732912_sorted_dedup_reads.bam -R ${ref} --bqsr-recal-file {$data}/recal_12data.table -O ${aligned_reads}/P732912_sorted_dedup_bqsr_reads.bam
-echo 'done with base quality recalibration of CAD12'
+
+gatk ApplyBQSR -I ${aligned_reads}/P732912_sorted_dedup_reads.bam -R ${ref} --bqsr-recal-file {$data}/recal_12data.table \
+    -O ${aligned_reads}/P732912_sorted_dedup_bqsr_reads.bam
+
+echo 'done'
 
 ```
 
@@ -278,7 +220,7 @@ echo 'done with base quality recalibration of CAD12'
 # ----------------------------------
 
 ```bash
-samtools flagstat 931263_sorted_dedup_reads.bam
+samtools flagstat P732912_sorted_dedup_bqsr_reads.bam
 ```
 
 
@@ -288,6 +230,7 @@ samtools flagstat 931263_sorted_dedup_reads.bam
 ```bash
 module load gatk
 module load R
+
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 aligned_reads="/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads"
 
@@ -309,6 +252,7 @@ echo "Done with step 5 alignment and insert size metrics CAD12"
 
 ```bash
 module load gatk
+
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 aligned_reads="/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads"
 results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
@@ -317,13 +261,15 @@ echo "STEP 6: Call Variants - gatk haplotype caller --CAD12"
 
 gatk HaplotypeCaller -R ${ref} -I ${aligned_reads}/P732912_sorted_dedup_bqsr_reads.bam -O \
     ${results}/raw_variants_CAD12.vcf
+
 # extract SNPs & INDELS
 gatk SelectVariants -R ${ref} -V ${results}/raw_variants_CAD12.vcf --select-type SNP -O \
     ${results}/raw_snps_CAD12.vcf
+
 gatk SelectVariants -R ${ref} -V ${results}/raw_variants_CAD12.vcf --select-type INDEL -O \
     ${results}/raw_indels_CAD12.vcf
 
-echo "done with variant calling for CAD12"
+echo "done"
 ```
 
 
@@ -333,10 +279,12 @@ echo "done with variant calling for CAD12"
 
 ```bash
 module load gatk
+
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
 
 echo "Filter SNPs"
+
 gatk VariantFiltration \
     -R ${ref} \
     -V ${results}/raw_snps_CAD12.vcf \
@@ -353,6 +301,7 @@ gatk VariantFiltration \
     -genotype-filter-name "GQ_filter"
 
 echo "Filter INDELS"
+
 gatk VariantFiltration \
     -R ${ref} \
     -V ${results}/raw_indels_CAD12.vcf \
@@ -366,12 +315,14 @@ gatk VariantFiltration \
     -genotype-filter-name "GQ_filter"
 
 echo "Select SNPs that PASS filters"
+
 gatk SelectVariants \
     --exclude-filtered \
     -V ${results}/filtered_snps_CAD12.vcf \
     -O ${results}/analysis_ready_snps_CAD12.vcf
 
 echo "Select INDELs that PASS filters"
+
 gatk SelectVariants \
     --exclude-filtered \
     -V ${results}/filtered_indels_CAD12.vcf \
@@ -415,6 +366,7 @@ results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
 
 # to exclude variants that failed genotype filters
 cat ${results}/analysis_ready_snps_CAD12.vcf | grep -v -E "DP_filter|GQ_filter" > ${results}/analysis_ready_snps_CAD12_filtered_DP_GQ.vcf
+
 cat ${results}/analysis_ready_indels_CAD12.vcf | grep -v -E "DP_filter|GQ_filter" > ${results}/analysis_ready_indels_CAD12_filtered_DP_GQ.vcf
 
 echo "done"
@@ -424,8 +376,9 @@ echo "done"
 # -------------------
 # downloaded the following files for vep annotation
 # -------------------
+
 ```
-# VEP hg38 used for missense score annotation ##
+# VEP hg38 > funcotator imo ##
 
 analysis_ready_snps_CAD12_filtered_DP_GQ.vcf
 analysis_ready_indels_CAD12_filtered_DP_GQ.vcf
@@ -436,8 +389,9 @@ analysis_ready_indels_CAD63_filtered_DP_GQ.vcf
 
 
 # -------------------
-# Funcotator alternative route
+# Funcotator (alternative to vep)
 # -------------------
+
 ```bash
 # gatk Funcotator \
 #     --variant ${results}/analysis_ready_snps_CAD12_filtered_DP_GQ.vcf \
