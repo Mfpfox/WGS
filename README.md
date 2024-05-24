@@ -14,7 +14,6 @@ May 24, 2024
 
 ```bash
 reads="/sc/arion/projects/vascbrain/WGS_iPSC/raw_data/P732912"
-reads="/sc/arion/projects/vascbrain/WGS_iPSC/raw_data/P931263"
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 known_sites="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.dbsnp138.vcf"
 aligned_reads="/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads"
@@ -28,7 +27,7 @@ module load picard/3.1.1
 module load gatk/4.3.0.0
 ```
 
-########### interactive session bsub4 ########################################
+########### only run once (done for hg38) ########################################
 ```bash
 # reference genome
 wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta
