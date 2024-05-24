@@ -10,9 +10,14 @@ May 24, 2024
 
 [wget hg38 ref source](https://console.cloud.google.com/storage/browser/gcp-public-data--broad-references/hg38/v0;tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false)
 
-#################### PATHS and MODULES ###############################################
+
+# --------------------------------------
+# STEP 0: 
+# --------------------------------------
 
 ```bash
+#################### PATHS and MODULES ###############################################
+
 reads="/sc/arion/projects/vascbrain/WGS_iPSC/raw_data/P732912"
 ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
 known_sites="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.dbsnp138.vcf"
@@ -27,8 +32,9 @@ module load picard/3.1.1
 module load gatk/4.3.0.0
 ```
 
-########### only run once (done for hg38) ########################################
 ```bash
+########### only run once (done for hg38) ########################################
+
 # reference genome
 wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta
 
@@ -262,7 +268,7 @@ echo "done"
 
 
 # -------------------
-# STEP 7 Filter Variants - GATK4 CAD12
+# STEP 7: Filter Variants - GATK4
 # -------------------
 
 ```bash
@@ -321,7 +327,7 @@ echo "done"
 
 
 # -------------------
-# STEP 8 QC grep : filter by pattern match inversion
+# STEP 8: grep arg test for pattern match inversion
 # -------------------
 
 ```bash
@@ -347,7 +353,7 @@ grep -m 4 -E "DP_filter|GQ_filter" analysis_ready_snps_CAD12.vcf
 ```
 
 # -------------------
-# STEP 8 Filter Variants - grep CAD12
+# STEP 8: Filter Variants with grep
 # -------------------
 ```bash
 results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
