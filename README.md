@@ -50,17 +50,21 @@ wget https://storage.googleapis.com/gcp-public-data--broad-references/hg38/v0/Ho
 ```
 
 
-# -------------------
+# --------------------------------------
 # STEP 1: QC raw reads
-# -------------------
+# --------------------------------------
+
 
 ```bash
 """man fastqc--non-interactive session keep noextract flagst-outputs a fastqc.zip 
     file-this step has same input as following step when no trimming is needed"""
 
 echo "STEP 1: QC - Run fastqc - skip trimming if quality checks out"
+
 fastqc ${reads}/P732912_FDSW220142847_1r_HYMM2DSX2_L1_1.fq.gz -o ${reads}/
+
 fastqc ${reads}/P732912_FDSW220142847_1r_HYMM2DSX2_L1_2.fq.gz -o ${reads}/
+
 echo "done STEP 1"
 ```
 
@@ -72,18 +76,22 @@ echo "done STEP 1"
 
 ```bash
 echo "STEP 2: Map to reference using BWA-MEM"
+
 # BWA index reference use -64 option to specific 64 bit (alt index)
 bwa index ${ref}
+
 # BWA alignment with grouping tag step
     # SM is sample
     # ID from illumina
     # PL is platform
     # -R grouping ID added to each read in output sam file
     # -t multi-threading mode
+
 bwa mem -t 4 -R "@RG\tID:P732912\tPL:ILLUMINA\tSM:P732912" \
     ${ref} ${reads}/P732912_FDSW220142847_1r_HYMM2DSX2_L1_1.fq.gz \
     ${reads}/P732912_FDSW220142847_1r_HYMM2DSX2_L1_2.fq.gz \
     > ${aligned_reads}/P732912.paired.sam
+
 echo "done STEP 2: read alignment to hg38"
 ```
 
@@ -93,48 +101,39 @@ echo "done STEP 2: read alignment to hg38"
 # --------------------------------------
 
 ```bash
+samtools view P732912.paired.sam | less        # check sam file
 
-# 1. check sam file
-    samtools view P732912.paired.sam | less
-
-# 2. check flagstat file 
-    samtools flagstat P732912.paired.sam
+samtools flagstat P732912.paired.sam        # check flagstat file
 ```
 
 
 
 
 # -----------------------------------------
-# STEP 3: ISSUE = time when dedup and sorting coupled
+# STEP 3: use picard sort to solve time issue with markduplicatesSpark (sort & dedup)
 # -----------------------------------------
+
+* markduplicates attempt ran over lsf time and had a ton of I/O messages from SPARK, 
+    * spark is super I/O hungry so best to use SSD thats fast 
+    * also recommended to try allocating mem to spark, and add temp directory 
+    * so the writing from spark doesnt eat up the memory for processing
+
+* gatk community board recommendation for large files :
+    * try first using queryname sort before running the mark duplicates function
+    * this could speed up time to mark duplicates, reduce by 1/2 total time needed
+  
 ```bash
-"""
-markduplicates attempt ran over lsf time and had a ton of I/O messages from SPARK, 
-    spark is super I/O hungry so best to use SSD thats fast 
-    also recommended to try allocating mem to spark, and add temp directory 
-    so the writing from spark doesnt eat up the memory for processing
+module load picard/3.1.1            # loaded picard in interactive
 
-    gatk community board recommendation for large files :
-        try first using queryname sort before running the mark duplicates function
-            this could speed up time to mark duplicates, reduce by 1/2 total time needed
-"""
+echo $PICARD                        # /hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar
 
-## loaded picard in interactive
-module load picard/3.1.1
+PICARD SortSam                      #/hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar: Permission denied
 
-echo $PICARD
-# /hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar
-
-$PICARD SortSam
-#/hpc/packages/minerva-centos7/picard/3.1.1/bin/picard.jar: Permission denied
-
-java -jar $PICARD SortSam
-# USAGE: SortSam [arguments]
-
+java -jar $PICARD SortSam           # USAGE: SortSam [arguments]
 ```
 
 # -----------------------------------------
-# STEP 3: solution - SORT before Mark Duplicates
+# STEP 3: sorting pre- Mark Duplicates
 # -----------------------------------------
 
 ```bash
@@ -147,44 +146,34 @@ java -jar $PICARD SortSam \
      SORT_ORDER=queryname
 
 echo 'done sorting CAD12'
+```
 
+```bash
+# QC sort output
 
 samtools flagstat P732912.paired.sorted.sam
 ```
 
-
 # -----------------------------------------
-# STEP 3: Mark Duplicates and Sort - GATK4
+# STEP 3: Mark Duplicates
 # -----------------------------------------
 
 ```bash
-"""
-# from very end of this link:
-    https://gatk.broadinstitute.org/hc/en-us/community/posts/360058452072-MarkDuplicatesSpark-consumes-enormous-amount-of-RAM
-    --conf 'spark.kryo.referenceTracking=false'
-        what it means: https://spark.apache.org/docs/1.4.1/configuration.html
-# check temp java dir
-    java -XshowSettings:properties --version 2&1 >/dev/null | grep tmpdir
-# ran for 48 hours with 1 thread and  --conf 'spark.kryo.referenceTracking=false'
-    took 24 hours and output was 51gb
-# 4 threads worked and 6 is advised against
-"""
+echo "STEP 3: Mark Duplicates and Sort - GATK4"
 
-echo "STEP 3: Mark Duplicates and Sort - GATK4 --CAD12"
 gatk MarkDuplicatesSpark -I ${aligned_reads}/P732912.paired.sorted.sam -O \
     ${aligned_reads}/P732912_sorted_dedup_reads.bam
 
+echo "done"
 ```
 
 # -----------------------------------------
-# STEP 3: QC sorted and de-duplicated output
+# STEP 3: QC MarkDuplicatesSpark output
 # -----------------------------------------
 
 ```bash
 samtools flagstat P732912_sorted_dedup_reads.bam
 ```
-
-
 
 
 # ----------------------------------
@@ -222,7 +211,6 @@ echo 'done'
 ```bash
 samtools flagstat P732912_sorted_dedup_bqsr_reads.bam
 ```
-
 
 # -----------------------------------------------
 # STEP 5: Collect Alignment & Insert Size Metrics
