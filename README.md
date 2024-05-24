@@ -1,4 +1,4 @@
-# WGS variant calling SOP based on GATK4 best practices for germline short variant discovery
+# WGS variant calling - CAD12 demo - based on GATK4 best practices for germline short variant discovery
 
 @mfpfox
 
