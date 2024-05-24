@@ -1,5 +1,6 @@
 ## find /Users/mariapalafox/Desktop/TOOLBOXR -name ".git" -print
 moving_data_to_minerva_steps.sh
+variant_calling_scratch.sh
 
 .DS_Store
 .idea
