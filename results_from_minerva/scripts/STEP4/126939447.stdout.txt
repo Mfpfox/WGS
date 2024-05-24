@@ -1,0 +1,79 @@
+Sender: LSF System <lsfadmin@lc02g06>
+Subject: Job 126939447: <step4_63> in cluster <chimera> Done
+
+Job <step4_63> was submitted from host <li03c04.chimera.hpc.mssm.edu> by user <palafm01> in cluster <chimera> at Mon May 20 16:29:10 2024
+Job was executed on host(s) <2*lc02g06>, in queue <premium>, as user <palafm01> in cluster <chimera> at Mon May 20 16:29:15 2024
+                            <2*lc02a21>
+</hpc/users/palafm01> was used as the home directory.
+</sc/arion/projects/vascbrain/WGS_iPSC/scripts/STEP4> was used as the working directory.
+Started at Mon May 20 16:29:15 2024
+Terminated at Mon May 20 22:22:16 2024
+Results reported at Mon May 20 22:22:16 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J step4_63
+#BSUB -P acc_vascbrain
+#BSUB -q premium
+#BSUB -W 20:00
+#BSUB -n 4
+#BSUB -R rusage[mem=16000]
+#BSUB -oo %J.stdout
+#BSUB -eo %J.stderr
+#BSUB -L /bin/bash
+
+module load gatk
+
+ref="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.fasta"
+known_sites="/sc/arion/projects/vascbrain/WGS_iPSC/hg38_bundle_wget/Homo_sapiens_assembly38.dbsnp138.vcf"
+aligned_reads="/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads"
+results="/sc/arion/projects/vascbrain/WGS_iPSC/results"
+data="/sc/arion/projects/vascbrain/WGS_iPSC/data"
+
+echo "STEP 4: Base quality recalibration --CAD63"
+
+# 1. build the model
+
+gatk BaseRecalibrator -I ${aligned_reads}/P931263_sorted_dedup_reads.bam -R ${ref} --known-sites ${known_sites} -O ${data}/recal_63data.table
+echo "recal_63data.table created"
+
+# 2. Apply the model to adjust the base quality scores
+
+gatk ApplyBQSR -I ${aligned_reads}/P931263_sorted_dedup_reads.bam -R ${ref} --bqsr-recal-file ${data}/recal_63data.table -O ${aligned_reads}/P931263_sorted_dedup_bqsr_reads.bam
+
+echo "done with base quality recalibration for CAD63"
+
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   29074.17 sec.
+    Max Memory :                                 628 MB
+    Average Memory :                             450.92 MB
+    Total Requested Memory :                     64000.00 MB
+    Delta Memory :                               63372.00 MB
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                16
+    Run time :                                   21180 sec.
+    Turnaround time :                            21186 sec.
+
+The output (if any) follows:
+
+STEP 4: Base quality recalibration --CAD63
+Tool returned:
+SUCCESS
+recal_63data.table created
+done with base quality recalibration for CAD63
+
+
+PS:
+
+Read file <126939447.stderr> for stderr output of this job.
+
