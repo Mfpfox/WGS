@@ -29,6 +29,7 @@ WGS.code-workspace
 
 *.gz
 *.zip
+*.csi
 
 *.vcf
 *.html
