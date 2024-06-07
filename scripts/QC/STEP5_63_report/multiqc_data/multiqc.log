@@ -1,0 +1,6 @@
+[2024-05-21 21:39:26,883] multiqc.core.file_search                           [INFO   ]  Search path: /sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads/STEP5_63_report
+[2024-05-21 21:39:27,168] multiqc.modules.picard.picard                      [INFO   ]  Found 1 AlignmentSummaryMetrics reports
+[2024-05-21 21:39:27,182] multiqc.modules.picard.picard                      [INFO   ]  Found 1 InsertSizeMetrics reports
+[2024-05-21 21:39:27,250] multiqc.core.write_results                         [INFO   ]  Data        : multiqc_data
+[2024-05-21 21:39:27,470] multiqc.core.write_results                         [INFO   ]  Report      : multiqc_report.html
+[2024-05-21 21:39:27,479] multiqc.multiqc                                    [INFO   ]  MultiQC complete
