@@ -1,2 +1,0 @@
-Sample	Mean Read Length
-P931263_sorted_dedup_bqsr_reads	150

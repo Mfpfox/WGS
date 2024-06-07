@@ -1,2 +1,0 @@
-Sample	None_mqc-generalstats-picard_insertsizemetrics-summed_median	None_mqc-generalstats-picard_insertsizemetrics-summed_mean
-P931263_sorted_dedup_bqsr_reads	340	345.331647

@@ -1,2 +1,0 @@
-Sample	Aligned Reads	Unaligned Reads
-P732912_sorted_dedup_bqsr_reads	343735134.5	532114.5

@@ -1,3 +1,0 @@
-Module	Section	Sample Name	Source
-Picard	AlignmentSummaryMetrics	P732912_sorted_dedup_bqsr_reads	/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads/STEP5_12_report/alignment_12metrics.txt
-Picard	InsertSizeMetrics	P732912_sorted_dedup_bqsr_reads	/sc/arion/projects/vascbrain/WGS_iPSC/aligned_reads/STEP5_12_report/insert_size_12metrics.txt
