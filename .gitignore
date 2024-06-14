@@ -1,19 +1,12 @@
 ## find /Users/mariapalafox/Desktop/TOOLBOXR -name ".git" -print
 
-moving_data_to_minerva_steps.sh
-variant_calling_scratch.sh
-
-scripts_local_notes/
-scripts_local_notes
-
 1-raw/
 1-raw
 
 3-hg38_bundle_wget
 3-hg38_bundle_wget/
 
-2-Background
-2-Background/
+*.code-workspace
 
 *.stderr
 *.stdout
@@ -26,8 +19,6 @@ scripts_local_notes
 *__pycache__*
 LICENSE
 *.exe
-README.md
-WGS.code-workspace
 
 *.gz
 *.zip
@@ -35,7 +26,9 @@ WGS.code-workspace
 
 *.vcf
 *.html
-*.txt
+#*.txt
+#.pdf
+#.rtf
 *.csv
 *.tsv
 *.pptx
@@ -45,6 +38,9 @@ WGS.code-workspace
 *.xlsx
 *.xls
 #*.png
-*.JPG
-*.jpeg
-#*.pdf
+#*.JPG
+#*.jpeg
+#*.svg
+
+
+
