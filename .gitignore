@@ -3,6 +3,9 @@
 1-raw/
 1-raw
 
+4-gatk/STEP2/step2_error_logs/
+4-gatk/STEP2/step2_error_logs
+
 3-hg38_bundle_wget
 3-hg38_bundle_wget/
 
@@ -26,7 +29,7 @@ LICENSE
 
 *.vcf
 *.html
-#*.txt
+*.txt
 #.pdf
 #.rtf
 *.csv
