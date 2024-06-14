@@ -1,0 +1,2 @@
+Sample	Aligned Bases
+P931263_sorted_dedup_bqsr_reads	108763104272
