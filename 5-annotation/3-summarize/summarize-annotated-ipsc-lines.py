@@ -1,37 +1,39 @@
+# !/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+# input: individual WGS vep annotated output files for CAD12 and CAD63
+# output: summary excel file that replicates vep html report summary
 
 from all_funx import *
 
-# input: individual WGS results for indels
-# output: vep html equivalent plots for report
+path = "/Users/mariapalafox/Desktop/BOLDcaution/WGS/5-annotation/3-summarize/1-input/"
 
-# read in the annotated indels and snps
-indel12 = pd.read_csv("annotated_indels_CAD12_autoX.txt", delimiter="\t", engine='python',\
+indel1 = pd.read_csv(path + "annotated_indels_CAD12_autoX.txt", delimiter="\t", engine='python',\
                  comment='##')
 
-snp12 = pd.read_csv("annotated_snps_CAD12_autoX.txt", delimiter="\t", engine='python',\
+snp1 = pd.read_csv(path + "annotated_snps_CAD12_autoX.txt", delimiter="\t", engine='python',\
                   comment='##')
 
-indel63 = pd.read_csv("annotated_indels_CAD63_autoX.txt", delimiter="\t", engine='python',\
+indel6 = pd.read_csv(path + "annotated_indels_CAD63_autoX.txt", delimiter="\t", engine='python',\
                        comment='##')
 
-snp63 = pd.read_csv("annotated_snps_CAD63_autoX.txt", delimiter="\t", engine='python',\
+snp6 = pd.read_csv(path + "annotated_snps_CAD63_autoX.txt", delimiter="\t", engine='python',\
                          comment='##')
 
 
-
-
 # rename column
-indel12 = renameit(indel12, '#Uploaded_variation', 'Uploaded_variation')
-snp12 = renameit(snp12, '#Uploaded_variation', 'Uploaded_variation')
-indel63 = renameit(indel63, '#Uploaded_variation', 'Uploaded_variation')
-snp63 = renameit(snp63, '#Uploaded_variation', 'Uploaded_variation')
-
+indel12 = renameit(indel1, '#Uploaded_variation', 'Uploaded_variation')
+snp12 = renameit(snp1, '#Uploaded_variation', 'Uploaded_variation')
+indel63 = renameit(indel6, '#Uploaded_variation', 'Uploaded_variation')
+snp63 = renameit(snp6, '#Uploaded_variation', 'Uploaded_variation')
 
 # split Location column on : to get chromosome and chrCoordinate new columns
 indel12[['chromosome', 'chrCoordinate']] = indel12['Location'].str.split(':', expand=True)
+
 snp12[['chromosome', 'chrCoordinate']] = snp12['Location'].str.split(':', expand=True)
+
 indel63[['chromosome', 'chrCoordinate']] = indel63['Location'].str.split(':', expand=True)
+
 snp63[['chromosome', 'chrCoordinate']] = snp63['Location'].str.split(':', expand=True)
 
 
@@ -39,11 +41,13 @@ snp63[['chromosome', 'chrCoordinate']] = snp63['Location'].str.split(':', expand
 # NOTE the indel df  start position is being used as chrCoordinate and the start could actually be larger than end position depending on strand 
 
 indel12['chrCoordinate'] = indel12['chrCoordinate'].str.split('-',expand=False).str[0]
+
 indel12['chrCoordinate'] = indel12['chrCoordinate'].astype(int)
 
 snp12['chrCoordinate'] = snp12['chrCoordinate'].astype(int)
 
 indel63['chrCoordinate'] = indel63['chrCoordinate'].str.split('-',expand=False).str[0]
+
 indel63['chrCoordinate'] = indel63['chrCoordinate'].astype(int)
 
 snp63['chrCoordinate'] = snp63['chrCoordinate'].astype(int)
@@ -67,6 +71,7 @@ snp12['CDS_position'] = snp12['CDS_position'].replace('-', np.nan)
 indel63['CDS_position'] = indel63['CDS_position'].replace('-', np.nan)
 snp63['CDS_position'] = snp63['CDS_position'].replace('-', np.nan)
 
+
 # change Protein_position column values equal to "-" to nan
 indel12['Protein_position'] = indel12['Protein_position'].replace('-', np.nan)
 snp12['Protein_position'] = snp12['Protein_position'].replace('-', np.nan)
@@ -89,22 +94,23 @@ snp63['DISTANCE'] = snp63['DISTANCE'].replace('-', np.nan)
 
 
 # if SIFT column contains a value, split the column on "(" to get SIFTprediction and SIFTscore, remove ")" from SIFTscore and change SIFTscore to type float
-snp12[['SIFTprediction', 'SIFTscore']] = snp12['SIFT'].str.split('(', expand=True)
+snp12[['SIFTprediction', 'SIFTscore']] = snp12['SIFT'].str.split('(', 
+                                                            expand=True)
 snp12['SIFTscore'] = snp12['SIFTscore'].str.replace(')', '')
 snp12['SIFTscore'] = snp12['SIFTscore'].astype(float)
-snp63[['SIFTprediction', 'SIFTscore']] = snp63['SIFT'].str.split('(', expand=True)
+snp63[['SIFTprediction', 'SIFTscore']] = snp63['SIFT'].str.split('(', 
+                                                            expand=True)
 snp63['SIFTscore'] = snp63['SIFTscore'].str.replace(')', '')
 snp63['SIFTscore'] = snp63['SIFTscore'].astype(float)
-
 
 # if PolyPhen column contains a value, split the column on "(" to get PolyPhenprediction and PolyPhenscore, remove ")" from PolyPhenscore and change PolyPhenscore to type float
 snp12[['PolyPhenprediction', 'PolyPhenscore']] = snp12['PolyPhen'].str.split('(', expand=True)
 snp12['PolyPhenscore'] = snp12['PolyPhenscore'].str.replace(')', '')
 snp12['PolyPhenscore'] = snp12['PolyPhenscore'].astype(float)
+
 snp63[['PolyPhenprediction', 'PolyPhenscore']] = snp63['PolyPhen'].str.split('(', expand=True)
 snp63['PolyPhenscore'] = snp63['PolyPhenscore'].str.replace(')', '')
 snp63['PolyPhenscore'] = snp63['PolyPhenscore'].astype(float)
-
 
 # duplicate EXON and save as new column EXONnumber
 indel12['EXONnumber'] = indel12['EXON']
@@ -112,13 +118,11 @@ snp12['EXONnumber'] = snp12['EXON']
 indel63['EXONnumber'] = indel63['EXON']
 snp63['EXONnumber'] = snp63['EXON']
 
-
 # change EXONnumber and INTRONnumber columns values equal to "-" to nan
 indel12['EXONnumber'] = indel12['EXONnumber'].replace('-', np.nan)
 snp12['EXONnumber'] = snp12['EXONnumber'].replace('-', np.nan)
 indel63['EXONnumber'] = indel63['EXONnumber'].replace('-', np.nan)
 snp63['EXONnumber'] = snp63['EXONnumber'].replace('-', np.nan)
-
 
 # split the EXONnumber and INTRONnumber column values on "/", retain only the value before the "/"
 indel12['EXONnumber'] = indel12['EXONnumber'].str.split('/').str[0]
@@ -126,13 +130,11 @@ snp12['EXONnumber'] = snp12['EXONnumber'].str.split('/').str[0]
 indel63['EXONnumber'] = indel63['EXONnumber'].str.split('/').str[0]
 snp63['EXONnumber'] = snp63['EXONnumber'].str.split('/').str[0]
 
-
 # duplicate INTRON column and save as new column INTRONnumber
 indel12['INTRONnumber'] = indel12['INTRON']
 snp12['INTRONnumber'] = snp12['INTRON']
 indel63['INTRONnumber'] = indel63['INTRON']
 snp63['INTRONnumber'] = snp63['INTRON']
-
 
 # change INTRONnumber column values equal to "-" to nan
 indel12['INTRONnumber'] = indel12['INTRONnumber'].replace('-', np.nan)
@@ -140,14 +142,11 @@ snp12['INTRONnumber'] = snp12['INTRONnumber'].replace('-', np.nan)
 indel63['INTRONnumber'] = indel63['INTRONnumber'].replace('-', np.nan)
 snp63['INTRONnumber'] = snp63['INTRONnumber'].replace('-', np.nan)
 
-
 # split the INTRONnumber column values on "/", retain only the value before the "/"
 indel12['INTRONnumber'] = indel12['INTRONnumber'].str.split('/').str[0]
 snp12['INTRONnumber'] = snp12['INTRONnumber'].str.split('/').str[0]
 indel63['INTRONnumber'] = indel63['INTRONnumber'].str.split('/').str[0]
 snp63['INTRONnumber'] = snp63['INTRONnumber'].str.split('/').str[0]
-
-
 
 # if column name contains "gnomAD", change the "-" values to nan 
 for i in indel12.columns:
@@ -176,20 +175,17 @@ snp12['MAX_AF'] = snp12['MAX_AF'].replace('-', np.nan)
 indel63['MAX_AF'] = indel63['MAX_AF'].replace('-', np.nan)
 snp63['MAX_AF'] = snp63['MAX_AF'].replace('-', np.nan)
 
-
 # change MAX_AF to type float
 indel12['MAX_AF'] = indel12['MAX_AF'].astype(float)
 snp12['MAX_AF'] = snp12['MAX_AF'].astype(float)
 indel63['MAX_AF'] = indel63['MAX_AF'].astype(float)
 snp63['MAX_AF'] = snp63['MAX_AF'].astype(float)
 
-
 # change the "-" values in column CLIN_SIG to nan
 indel12['CLIN_SIG'] = indel12['CLIN_SIG'].replace('-', np.nan)
 snp12['CLIN_SIG'] = snp12['CLIN_SIG'].replace('-', np.nan)
 indel63['CLIN_SIG'] = indel63['CLIN_SIG'].replace('-', np.nan)
 snp63['CLIN_SIG'] = snp63['CLIN_SIG'].replace('-', np.nan)
-
 
 print(indel12.dtypes)
 print(snp12.dtypes)
@@ -202,38 +198,20 @@ snp12['EXONnumber'] = snp12['EXONnumber'].astype(float)
 indel63['EXONnumber'] = indel63['EXONnumber'].astype(float)
 snp63['EXONnumber'] = snp63['EXONnumber'].astype(float)
 
-# a function that takes a list of columns and dataframe and returns the dataframe with the columns converted to type float
+
 def convert_to_float(df, col_list):
+    # a function that takes a list of columns and dataframe and 
+    # returns the dataframe with the columns converted to type float
     for i in col_list:
         df[i] = df[i].astype(float)
     return(df)
 
 col_list = ['DISTANCE', 'INTRONnumber', 'EXONnumber']
-
 indel12 = convert_to_float(indel12, col_list)
 snp12 = convert_to_float(snp12, col_list)
 indel63 = convert_to_float(indel63, col_list)
 snp63 = convert_to_float(snp63, col_list)
 
-
-
-
-
-
-def checkColumnValue(df, col):
-    df2= df[col].value_counts(dropna=False).reset_index().rename(columns={'index':col, col:'Count'})
-    return(df2)
-
-
-def save_crosstabit_sheet(df, col1, col2, showna):
-    # col1 and col2 are categorical contingency table
-    # conditional added for crosstab() arg dropna=False failure
-    if showna:
-        crosstab = pd.crosstab(df[col1].fillna('NA'), df[col2].fillna('NA'),  margins=True, margins_name="Total" )
-    else:
-        crosstab = pd.crosstab(df[col1], df[col2],  margins=True, margins_name="Total")
-    saveout =  col1 + '_x_' + col2
-    return(crosstab, saveout)
 
 
 def excel_summary_of_vep_dataframe(i, dfname):
@@ -261,11 +239,10 @@ def excel_summary_of_vep_dataframe(i, dfname):
     x6,s6 = save_crosstabit_sheet(i, "SYMBOL", "IMPACT", True)
     describee = pd.DataFrame(i.describe()).T
     checkna = i.isna().sum()
-    # update excel_summary_of_vep_dataframe function to write objects to separate sheets of an excel 
+    # write objects to separate sheets of an excel 
     output = dfname + 'excel_summary_of_vep_dataframe.xlsx'
     with pd.ExcelWriter(output) as writer:
        typedf.to_excel(writer, sheet_name='datatypes')
-
        desdf.to_excel(writer, sheet_name='descriptive_stats')
        featureType.to_excel(writer, sheet_name='Feature_type')
        conseq.to_excel(writer, sheet_name='Consequence')
@@ -290,12 +267,31 @@ def excel_summary_of_vep_dataframe(i, dfname):
        checkna.to_excel(writer, sheet_name='checkna')
     print('saved excel_summary_of_vep_dataframe as :', output)
 
-
-excel_summary_of_vep_dataframe(indel12, 'indel12')
-excel_summary_of_vep_dataframe(snp12, 'snp12')
-excel_summary_of_vep_dataframe(indel63, 'indel63')
-excel_summary_of_vep_dataframe(snp63, 'snp63')
-
+# excel_summary_of_vep_dataframe(indel12, 'indel12')
+# excel_summary_of_vep_dataframe(snp12, 'snp12')
+# excel_summary_of_vep_dataframe(indel63, 'indel63')
+# excel_summary_of_vep_dataframe(snp63, 'snp63')
 
 
 
+#############################################
+#################### QC #####################
+#############################################
+# TODO does GIVEN_REF match USED_REF col?
+
+# TODO add keyID 38 aa
+
+# add Uniprot keyID
+
+# add keyID38aa
+
+
+
+
+
+# save cleaned files
+
+indel12.to_csv('indel12_1_summarize_output.csv', index=False)
+snp12.to_csv('snp12_1_summarize_output.csv', index=False)
+indel63.to_csv('indel63_1_summarize_output.csv', index=False)
+snp63.to_csv('snp63_1_summarize_output.csv', index=False)
