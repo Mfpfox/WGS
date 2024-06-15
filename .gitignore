@@ -1,5 +1,8 @@
 ## find /Users/mariapalafox/Desktop/TOOLBOXR -name ".git" -print
 
+5-annotation/.vscode/
+5-annotation/.vscode
+
 1-raw/
 1-raw
 
