@@ -1,7 +1,7 @@
 ## find /Users/mariapalafox/Desktop/TOOLBOXR -name ".git" -print
-
-5-annotation/.vscode/
-5-annotation/.vscode
+5-annotation/3-summarize/.Rhistory
+5-annotation/3-summarize/.ipynb_checkpoints/
+5-annotation/3-summarize/.vscode/
 
 1-raw/
 1-raw
@@ -50,3 +50,4 @@ LICENSE
 
 
 
+.Rproj.user
