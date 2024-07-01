@@ -1,3 +1,20 @@
+
+
+
+```{r echo=TRUE}
+wgs_db <- wgs %>%
+  dplyr::group_by(Database) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+wgs_db
+
+wgs2_db <- wgs2 %>%
+  dplyr::group_by(Database) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+wgs2_db
+```
+
 # Specify the file path
 file_path1 <- "1_clean_vep_output-snp-cad12.csv"
 file_path2 <- "1_clean_vep_output-snp-cad63.csv"
