@@ -54,8 +54,8 @@ wgs2[['ZYG']] <- factor(wgs2[['ZYG']])
 wgs2[['IND']] <- factor(wgs2[['IND']])
 
 wgs2[['IMPACT']] <- factor(wgs2[['IMPACT']], levels = c(
-  "MODIFIER",
   "LOW",
+  "MODIFIER",
   "MODERATE",
   "HIGH"
 ))
@@ -74,13 +74,7 @@ wgs2[['ClinVar']] <- factor(wgs2[['ClinVar']], levels = c(
   "PATHO"
 ))
 
-
 order_variants <- c("deletion","insertion","sequence_alteration","SNV")
 test_cv <- c("PATHO","VUS","BENIGN")
 
 
-wgs2 <- wgs2 %>% mutate(Database = case_when(
-  !is.na(ClinVar) & is.na(MAX.AF)  ~ "ClinVar",
-  !is.na(MAX.AF) & !is.na(ClinVar)  ~ "gnomAD & ClinVar",
-  !is.na(MAX.AF)  & is.na(ClinVar) ~ "gnomAD",
-  is.na(MAX.AF) & is.na(ClinVar) ~ "None"))
