@@ -6,131 +6,357 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, include=TRUE)
 ```
 
-
-```{r}
-library(correlationfunnel)
-library(tidyquant)
-library(plotly)
-library(tidyverse)
-library(shiny)
+```{r include=FALSE}
+source('import-wgs-cad63.R')
+source('import-wgs-cad12.R')
 ```
 
-
-```{r}
-source('import-combined-lines-data.R')
+```{r include=FALSE}
+source("plot-colors.R")
 ```
 
-```{r}
+"""
+maf and maf2 labels are added in python and based on MAX_AF column
+Database label is based on na values and added in python
 
-df[['SIFTprediction']] <- factor(df[['SIFTprediction']], levels = c(
-  "tolerated_low_confidence",
-  "tolerated",
-  "deleterious",
-  "deleterious_low_confidence"
+ [1] "Uploaded.variation"       "Location"                 "Allele"                   "Gene"                     "Feature"                  "Feature.type"             "Consequence"             
+ [8] "cDNA.position"            "CDS.position"             "Protein.position"         "Amino.acids"              "Codons"                   "Existing.variation"       "IND"                     
+[15] "ZYG"                      "REF.ALLELE"               "IMPACT"                   "DISTANCE"                 "STRAND"                   "FLAGS"                    "VARIANT.CLASS"           
+[22] "SYMBOL"                   "SYMBOL.SOURCE"            "HGNC.ID"                  "BIOTYPE"                  "CANONICAL"                "MANE.SELECT"              "MANE.PLUS.CLINICAL"      
+[29] "TSL"                      "APPRIS"                   "CCDS"                     "ENSP"                     "SWISSPROT"                "TREMBL"                   "UNIPARC"                 
+[36] "UNIPROT.ISOFORM"          "REFSEQ.MATCH"             "SOURCE"                   "REFSEQ.OFFSET"            "GIVEN.REF"                "USED.REF"                 "BAM.EDIT"                
+[43] "GENE.PHENO"               "SIFT"                     "PolyPhen"                 "EXON"                     "INTRON"                   "DOMAINS"                  "miRNA"                   
+[50] "HGVSc"                    "HGVSp"                    "HGVS.OFFSET"              "gnomADg.AF"               "gnomADg.AFR.AF"           "gnomADg.AMI.AF"           "gnomADg.AMR.AF"          
+[57] "gnomADg.ASJ.AF"           "gnomADg.EAS.AF"           "gnomADg.FIN.AF"           "gnomADg.MID.AF"           "gnomADg.NFE.AF"           "gnomADg.OTH.AF"           "gnomADg.SAS.AF"          
+[64] "MAX.AF"                   "MAX.AF.POPS"              "CLIN.SIG"                 "SOMATIC"                  "PHENO"                    "PUBMED"                   "MOTIF.NAME"              
+[71] "MOTIF.POS"                "HIGH.INF.POS"             "MOTIF.SCORE.CHANGE"       "TRANSCRIPTION.FACTORS"    "chromosome"               "chrCoordinate"            "EXONnumber"              
+[78] "INTRONnumber"             "chr"                      "GIVEN.REF.MATCH"          "SIFTprediction"           "SIFTscore"                "PolyPhenprediction"       "PolyPhenscore"           
+[85] "keyID38"                  "var.in.both.lines"        "var.exclusive.btw.lines"  "gene.in.both.lines"       "gene.exclusive.btw.lines" "MAF"                      "MAF2"                    
+[92] "PATHO"                    "VUS"                      "BENIGN"                   "ClinVar"                  "Database"  
+"""
+
+
+```{r combine into one df}
+simple_wgs <- wgs %>% select("Uploaded.variation", "Gene", "Feature.type", "Consequence", "Protein.position", "Amino.acids", 
+                             "Existing.variation", "IND", "ZYG", "IMPACT", "SYMBOL", "DOMAINS", "HGVSc", "gnomADg.AF", "gnomADg.AFR.AF",
+                             "gnomADg.AMI.AF", "gnomADg.AMR.AF", "gnomADg.ASJ.AF", "gnomADg.EAS.AF", "gnomADg.FIN.AF", "gnomADg.MID.AF", 
+                             "gnomADg.NFE.AF", "gnomADg.OTH.AF", "gnomADg.SAS.AF", "MAX.AF", "MAX.AF.POPS", "CLIN.SIG", "MOTIF.NAME", 
+                             "MOTIF.POS", "HIGH.INF.POS", "MOTIF.SCORE.CHANGE", "TRANSCRIPTION.FACTORS", "SIFTprediction", "SIFTscore", 
+                             "PolyPhenprediction", "PolyPhenscore", "var.in.both.lines", "var.exclusive.btw.lines", "gene.in.both.lines", 
+                             "gene.exclusive.btw.lines", "MAF", "MAF2", "PATHO", "VUS", "BENIGN", "ClinVar", "Database")
+
+simple_wgs2 <- wgs2 %>% select("Uploaded.variation", "Gene", "Feature.type", "Consequence", "Protein.position", "Amino.acids", 
+                             "Existing.variation", "IND", "ZYG", "IMPACT", "SYMBOL", "DOMAINS", "HGVSc", "gnomADg.AF", "gnomADg.AFR.AF",
+                             "gnomADg.AMI.AF", "gnomADg.AMR.AF", "gnomADg.ASJ.AF", "gnomADg.EAS.AF", "gnomADg.FIN.AF", "gnomADg.MID.AF", 
+                             "gnomADg.NFE.AF", "gnomADg.OTH.AF", "gnomADg.SAS.AF", "MAX.AF", "MAX.AF.POPS", "CLIN.SIG", "MOTIF.NAME", 
+                             "MOTIF.POS", "HIGH.INF.POS", "MOTIF.SCORE.CHANGE", "TRANSCRIPTION.FACTORS", "SIFTprediction", "SIFTscore", 
+                             "PolyPhenprediction", "PolyPhenscore", "var.in.both.lines", "var.exclusive.btw.lines", "gene.in.both.lines", 
+                             "gene.exclusive.btw.lines", "MAF", "MAF2", "PATHO", "VUS", "BENIGN", "ClinVar", "Database") 
+
+df <- rbind(simple_wgs, simple_wgs2)
+
+df[['IND']] <- factor(df[['IND']], levels = c(
+  "P732912",
+  "P931263"
 ))
 
-df[['PolyPhenprediction']] <- factor(df[['PolyPhenprediction']], levels = c(
-  "benign",
-  "unknown",
-  "possibly_damaging",
-  "probably_damaging"
-))
+txdf = df %>% filter(TRANSCRIPTION.FACTORS != "-")
 
-df[['VARIANT.CLASS']] <- factor(df[['VARIANT.CLASS']])
-                                
-df[['ZYG']] <- factor(df[['ZYG']])
-
-df[['IND']] <- factor(df[['IND']])
-
-df[['IMPACT']] <- factor(df[['IMPACT']])
-
-summary(df)
+missense = df %>% drop_na(SIFTprediction) # keyID38, sift prediction, and polyphen prediction all have the same number of missing values in cad12 and cad63 wgs dfs
 ```
 
 ```{r}
-names(df)
+summary_sift <- ddply(df, "IND", summarise, 
+                         Mean=mean(SIFTscore, na.rm = TRUE),
+                         Median=median(SIFTscore, na.rm = TRUE))
+print(summary_sift)
+
+summary_poly <- ddply(df, "IND", summarise, 
+                         Mean=mean(PolyPhenscore, na.rm = TRUE),
+                         Median=median(PolyPhenscore, na.rm = TRUE))
+print(summary_poly)
+```
+
+```{r}
+wgs %>%
+  dplyr::group_by(VARIANT.CLASS, var.exclusive.btw.lines) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+
+wgs %>%
+  dplyr::group_by(VARIANT.CLASS, var.in.both.lines) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+```
+
+## variant exclusive between lines and variant in both lines contain the same information, only need to plot one of these columns
+
+```{r}
+wgs %>%
+  dplyr::group_by(ClinVar, MAF2) %>%
+  dplyr::tally() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+
+  # Compute the total count and percentage
+#total_db <- 
+wgs %>%
+    dplyr::group_by(VARIANT.CLASS, ZYG) %>%
+    dplyr::tally() %>%
+    dplyr::mutate(Percent = round(n / sum(n) * 100, 1))
+```
+
+```{r}
+total_gnomad <- wgs %>%
+  dplyr::group_by(gnomadCONSEQ) %>%
+  dplyr::tally() %>%
+  drop_na() %>%
+  dplyr::mutate(Percent = round(n/sum(n) * 100, 1))
+names(total_gnomad) <- c("ProteinConsequence", "n", "Percent")
+total_gnomad$Database <- "gnomAD"
+sum(total_gnomad$n)
 ```
 
 
-```{r echo=TRUE}
-df %>%
-  dplyr::group_by(SIFTprediction, CLIN.SIG) %>%
-  tally()
+```{r echo=FALSE}
+source('plot-stacked-bar.R')
 
-df %>%
-  dplyr::group_by(PolyPhenprediction, CLIN.SIG) %>%
-  tally()
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "VARIANT.CLASS"
+xname <- "ID"
+plotTitle <- "..."
+
+plot1 <- create_stacked_bar_plot(wgs, "IND", "VARIANT.CLASS", var_colors, DBname1, fillname, xname, plotTitle)
+print(plot1)
+
+plot2 <- create_stacked_bar_plot(wgs2, "IND", "VARIANT.CLASS", var_colors, DBname2, fillname, xname, plotTitle)
+print(plot2)
+```
+
+```{r echo=FALSE}
+
+source("plot-interactive-stacked-bar.R")
+
+DBname1 <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "VARIANT.CLASS"
+xname <- "ID"
+plotTitle <- "..."
+
+plotly1 <- create_interactive_stacked_bar_plot(wgs, "IND", "VARIANT.CLASS", var_colors, DBname1, fillname, xname, plotTitle)
+plotly1
+plotly2 <- create_interactive_stacked_bar_plot(wgs2, "IND", "VARIANT.CLASS", var_colors, DBname2, fillname, xname, plotTitle)
+plotly2
+```
+
+## how many total variants were called in each cell line?
+
+```{r echo=FALSE}
+
+source('plot-dodge-bar.R')
+
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "VARIANT.CLASS"
+xname <- "ID"
+plotTitle <- "..."
+ylim = 3500000
+
+plot3 <- create_dodged_bar_plot(wgs, "IND", "VARIANT.CLASS", var_colors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot3)
+
+plot4 <- create_dodged_bar_plot(wgs2, "IND", "VARIANT.CLASS", var_colors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot4)
+```
+## how many of the called variants have been previously detected in the population database?
+
+```{r}
+source('plot-dodge-bar.R')
+
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "MAF"
+xname <- "VARIANT.CLASS"
+plotTitle <- "..."
+ylim = 3000000
+
+plot5 <- create_dodged_bar_plot(wgs, "VARIANT.CLASS", "MAF", maf_colors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "VARIANT.CLASS", "MAF", maf_colors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
+```
+```{r}
+source('plot-dodge-bar.R')
+
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "MAF2"
+xname <- "VARIANT.CLASS"
+plotTitle <- "..."
+ylim = 3100000
+
+plot5 <- create_dodged_bar_plot(wgs, "VARIANT.CLASS", "MAF2", maf_colors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "VARIANT.CLASS", "MAF2", maf_colors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
 ```
 
 
-```{r setup, include=FALSE}
+## how many of the cell line variants have previously been annotated in clinvar
+```{r}
+source('plot-dodge-bar.R')
 
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(ggplot2)
-library(readr)
-library(scales)
-library(ggpubr)
-library(RColorBrewer)
-library(tidyr)
-library(plyr)
-library(dplyr)
-library(wesanderson)
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
 
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "ClinVar"
+xname <- "VARIANT.CLASS"
+plotTitle <- "..."
+ylim = 3500000
+
+plot5 <- create_dodged_bar_plot(wgs, "VARIANT.CLASS", "ClinVar", unusedcolors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "VARIANT.CLASS", "ClinVar", unusedcolors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
 ```
 
 
 ```{r}
-bp_colors = c("#FF0000", "#08519c")
+source('plot-dodge-bar.R')
 
-normalized_dist_check <- ggplot(df, aes(x = MAX.AF, color=IND, fill = IND))
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
 
-hist_all <- normalized_dist_check + 
-  geom_histogram(position="identity", alpha=0.5)  + #bins=100, binwidth = 0.02 ,
-  #geom_vline(data=summary_mean_median, aes(xintercept=Mean, color=Type), size=1,  linetype="dashed") + 
-  #geom_vline(data=summary_mean_median, aes(xintercept=Median, color=Type), size=1, linetype="solid") + 
-  theme_bw() +
-  scale_fill_manual(values=bp_colors) +
-  scale_color_manual(values=bp_colors) +
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) + 
-  #ylab("Count") +
- # xlab("Measurement (mmHg)") +
- # ggtitle("Distribution of systolic and diastolic measurements (n=87)") +
-  theme(legend.position="right",
-        plot.title = element_text(hjust=0.5), 
-        axis.title.x = element_text(size=14, color="black", 
-                                    margin=margin(t=15, b=5)),
-        axis.title.y = element_text(size=14, color="black", margin=margin(t=0, r=15, b=0)), 
-        axis.text=element_text(size=13,vjust=0.5, color="black", margin=margin(t=20, b=20))) +  facet_grid(IND ~ .)
-hist_all
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "IMPACT"
+xname <- "IND"
+plotTitle <- "..."
+ylim = 4000000
 
+plot5 <- create_dodged_bar_plot(wgs, "IND", "IMPACT", unusedcolors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "IND", "IMPACT", unusedcolors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
+```
+
+```{r}
+source('plot-dodge-bar.R')
+
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "IMPACT"
+xname <- "VARIANT.CLASS"
+plotTitle <- "..."
+ylim = 4000000
+
+plot5 <- create_dodged_bar_plot(wgs, "VARIANT.CLASS", "IMPACT", unusedcolors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "VARIANT.CLASS", "IMPACT", unusedcolors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
+```
+
+
+
+```{r}
+source('plot-stacked-bar.R')
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "Database"
+xname <- "ID"
+plotTitle <- "..."
+
+plot1 <- create_stacked_bar_plot(wgs, "IND", "Database", var_colors, DBname1, fillname, xname, plotTitle)
+print(plot1)
+
+plot2 <- create_stacked_bar_plot(wgs2, "IND", "Database", var_colors, DBname2, fillname, xname, plotTitle)
+print(plot2)
+```
+
+```{r}
+source('plot-dodge-bar.R')
+
+# function(data, x_col, fill_col, var_colors, DBname, fillname, xname, plotTitle) {
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "IMPACT"
+xname <- "Database"
+plotTitle <- "..."
+ylim = 4000000
+
+plot5 <- create_dodged_bar_plot(wgs, "VARIANT.CLASS", "Database", unusedcolors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "VARIANT.CLASS", "Database", unusedcolors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
+```
+
+```{r}
+source('plot-dodge-bar.R')
+
+DBname <- "CAD12"
+DBname2 <- "CAD63"
+fillname <- "IND"
+xname <- "Chromosome"
+plotTitle <- "..."
+
+ylim = 4000000
+
+plot5 <- create_dodged_bar_plot(wgs, "chr", "IND", unusedcolors, DBname1, fillname, xname, plotTitle, ylim)
+print(plot5)
+
+plot6 <- create_dodged_bar_plot(wgs2, "chr", "IND", unusedcolors, DBname2, fillname, xname, plotTitle, ylim)
+print(plot6)
 ```
 
 
 ```{r}
-bxplot <- ggboxplot(df, x = factor("VARIANT.CLASS"), y = "SIFTscore", 
-                   # fill = ZYG, 
-                    alpha=0.8, 
-                    notch=FALSE) + 
-    #stat_pvalue_manual(stat_table, label = stat_label) +
-    #scale_fill_manual(values=colorname) + 
-    #scale_y_continuous(n.breaks = 9, limits=yrange) +
-    theme_bw() + 
-    # labs(x=xname,
-    #      y= ylabel,
-    #         title = titlename,
-    #      subtitle = subname,
-    #      caption = capname) +  
-    theme(panel.grid.minor = element_blank()) +
-    theme(legend.position='right') + 
-    theme(
-            axis.title.x = element_text(size=14, color="black", margin=margin(t=15, b=5)),
-            axis.title.y = element_text(size=14, color="black", margin=margin(t=0, r=15, b=0)), 
-            axis.text=element_text(size=12, color="black", margin=margin(t=20, b=20)))  
-bxplot
+
+```
+
+
+variants that are exclusive between the cell lines
+
+```{r}
+
+```
+
+## vep report 
+* chr and chromosome histogram
+* protein length position decile
+* create a dashboard that is similar in design to this html file output by ensembl vep software. I would like the dashboard to be based in R and use the R shiny package. I would like to use plotly package for interactive plots. The figures should have the data table that is represented in the figure below the table. 
+* 
+
+
+### notes
+* 
+
+## consequence and impact comparison between cell lines
+*
+
+## what genes have deleterious variants and how many deleterious variants do they have?? length as a fraction is better than not having a fraction because i cant normalize total counts any other way
+
+```{r}
+
 ```
 
