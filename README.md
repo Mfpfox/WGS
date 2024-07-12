@@ -7,7 +7,28 @@ created:  May 24, 2024
 
 last update: July 12, 2024
 
-## URLs
+#### Steps
+STEP 0: Set PATH, load Modules into environment, download Reference Genome
+
+STEP 1: QC foward and reverse raw sequencing files
+
+STEP 2: Map reads to Reference using BWA-MEM
+
+STEP 3: Mark Duplicate Reads
+
+STEP 4: Recalibrate Base Quality Scores
+
+STEP 5: Collect Alignment & Insert Size Metrics
+
+STEP 6: Call Variants using GATK haplotype caller
+
+STEP 7: Filter Variants using GATK4 VariantFiltration
+
+STEP 8: Filter Variants using grep pattern matching
+
+STEP 9: Annotated Variants using GATK Funcotator or Ensembl VEP
+
+#### URLs
 
 [GATK workflow](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
 
