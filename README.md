@@ -4,7 +4,8 @@ by @mfpfox
 SOP designed for processing one individual (CAD12 shown)
 
 created:  May 24, 2024
-last updated: July 12, 2024
+
+last update: July 12, 2024
 
 [GATK workflow](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
 
