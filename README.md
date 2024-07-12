@@ -8,7 +8,7 @@
 [wget hg38 ref source](https://console.cloud.google.com/storage/browser/gcp-public-data--broad-references/hg38/v0;tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false)
 
 
-# STEP 0: Set paths, load modules into minerva environment, and download genome reference
+# STEP 0: Set paths, load modules into minerva environment, and download reference genome
 
 ```bash
 #################### PATHS and MODULES ###############################################
