@@ -1,11 +1,7 @@
 # WGS variant calling steps based on [GATK4 best practices](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-) for germline short variant discovery
-by @mfpfox
-
-SOP designed for processing one individual (CAD12 shown)
-
-created:  May 24, 2024
-
-last update: July 12, 2024
+by @mfpfox | this README is designed to be a TEMPLATE for processing individual-level WGS data (code specific to processing CAD12 iPSC line shown below)
+* created:  May 24, 2024
+* last update: July 12, 2024
 
 #### Steps
 STEP 0: Set PATH, load Modules into environment, download Reference Genome
