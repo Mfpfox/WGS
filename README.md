@@ -18,7 +18,7 @@ last update: July 12, 2024
 
 # STEP 0: Set paths, load modules into minerva environment, and download reference genome
 
-```bash
+```python
 #################### PATHS and MODULES ###############################################
 
 reads="/sc/arion/projects/vascbrain/WGS_iPSC/raw_data/P732912"
