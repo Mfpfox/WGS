@@ -250,7 +250,7 @@ echo "done"
 
 
 
-# STEP 7: Filter Variants - GATK4
+# STEP 7: Filter Variants using GATK4
 
 ```bash
 module load gatk
@@ -308,7 +308,7 @@ echo "done"
 
 
 
-# STEP 8: Filter Variants with grep
+# STEP 8: Filter Variants using grep
 
 ```bash
 ######## grep arg test for pattern match inversion ############
