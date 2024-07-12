@@ -1,5 +1,6 @@
 # WGS variant calling steps based on GATK4 best practices for germline short variant discovery
-@mfpfox
+by @mfpfox
+
 SOP designed for processing one individual (CAD12 shown)
 
 created:  May 24, 2024
