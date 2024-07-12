@@ -35,7 +35,7 @@ module load picard/3.1.1
 module load gatk/4.3.0.0
 ```
 
-```bash
+```python
 ########### only run once (done for hg38) ########################################
 
 # reference genome
