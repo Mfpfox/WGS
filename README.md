@@ -7,6 +7,8 @@ created:  May 24, 2024
 
 last update: July 12, 2024
 
+# Background URLs
+
 [GATK workflow](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
 
 [GATK standard resource bundle](https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle)
