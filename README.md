@@ -116,9 +116,9 @@ samtools flagstat P732912.paired.sam        # check flagstat file
     * I learned that SPARK is super I/O hungry, and because of this, its generally best to write messages to a SSD (fastest I/O). On minerva, this could be a temp directory in user's home. Scratch has 20gb allocated. Essentially, you want the writing of messages to not eat up the job processing memory.
     * I learned that allocating more memory to SPARK could resolve the issue, but this was not the case for my runs of cad12 or cad63 
 
-* from review of 5 conversations on errors with large files from the gatk community board conversations, I learned that queryname sorting before running the mark duplicates spark function could be potential solution (true for CAD12 and CAD63). 
-    * the gatk representative mentioned that this could speed up time to mark duplicates spark, reducing it by 1/2 total time needed
-    * I want to note that sorting took 12 hours for both samples, so while the mark duplicate time was significantly reduced in my case with cad12 and cad63, overall, this solution does not significantly reduce time needed to complete marking duplicates step
+* after review of gatk community board conversations from 2012-2024 on errors with large files from the, I learned that people were generally frustrated with this step and some even scrapped using gatk all together. But for people like myself interested in continuing with GATK, queryname sorting before running the mark duplicates spark function was recommended as a potential solution.
+    *  gatk representative said pre-sorting could speed up time to mark duplicates, even showed data suggesting that pre-sorting reduced mark duplicates spark run time by 50%
+    * I initially was excited about the time reduction potential, but after my sorting job run of nearly 12 hours, its important to note that mark duplicates time is still high and minerva job parameters should be optimized in future runs
   
 ```bash
 ##### picard has queryname sort function ######
