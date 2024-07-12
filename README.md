@@ -1,4 +1,4 @@
-# WGS variant calling steps based on GATK4 best practices for germline short variant discovery
+# WGS variant calling steps based on [GATK4 best practices](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-) for germline short variant discovery
 by @mfpfox
 
 SOP designed for processing one individual (CAD12 shown)
@@ -28,16 +28,13 @@ STEP 8: Filter Variants using grep pattern matching
 
 STEP 9: Annotated Variants using GATK Funcotator or Ensembl VEP
 
-#### URLs
 
-[GATK workflow](https://gatk.broadinstitute.org/hc/en-us/articles/360035535932-Germline-short-variant-discovery-SNPs-Indels-)
-
-[GATK standard resource bundle](https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle)
-
-[wget hg38 ref source](https://console.cloud.google.com/storage/browser/gcp-public-data--broad-references/hg38/v0;tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false)
 
 
 # STEP 0: Set PATH, load Modules into environment, download Reference Genome
+Source
+* [GATK standard resource bundle](https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle)
+* [wget hg38 ref source](https://console.cloud.google.com/storage/browser/gcp-public-data--broad-references/hg38/v0;tab=objects?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&prefix=&forceOnObjectsSortingFiltering=false)
 
 ```python
 #################### PATHS and MODULES ###############################################
